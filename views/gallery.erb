@@ -6,7 +6,7 @@
 <div id="container">
 <% @users.each_with_index do |user,index| %>
 <div class="item" id="item<%= index %>" userid="<%= user.id %>">
-  <a href='http://www.facebook.com/profile.php?id=<%= user.id %>&sk=photos'>
+  <a href='/vote/<%= "%s/%s" % [@sex, user.id] %>'>
     <img src='<%= user.pic_square %>' title='<%= user.name %>' alt='<%= user.id %>' />
   </a>
 </div>
