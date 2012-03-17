@@ -1,0 +1,21 @@
+>> Writing PID to tmp/pids/thin.5002.pid
+>> Using rack adapter
+>> Thin web server (v1.2.11 codename Bat-Shit Crazy)
+>> Maximum connections set to 1024
+>> Listening on 0.0.0.0:5002, CTRL+C to stop
+>> Exiting!
+/home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/eventmachine-0.12.10/lib/eventmachine.rb:572:in `start_tcp_server': no acceptor (RuntimeError)
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/eventmachine-0.12.10/lib/eventmachine.rb:572:in `start_server'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/thin-1.2.11/lib/thin/backends/tcp_server.rb:16:in `connect'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/thin-1.2.11/lib/thin/backends/base.rb:53:in `block in start'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/eventmachine-0.12.10/lib/eventmachine.rb:256:in `call'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/eventmachine-0.12.10/lib/eventmachine.rb:256:in `run_machine'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/eventmachine-0.12.10/lib/eventmachine.rb:256:in `run'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/thin-1.2.11/lib/thin/backends/base.rb:61:in `start'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/thin-1.2.11/lib/thin/server.rb:159:in `start'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/thin-1.2.11/lib/thin/controllers/controller.rb:86:in `start'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/thin-1.2.11/lib/thin/runner.rb:185:in `run_command'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/thin-1.2.11/lib/thin/runner.rb:151:in `run!'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/gems/thin-1.2.11/bin/thin:6:in `<top (required)>'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/bin/thin:19:in `load'
+	from /home/fujitalab/.rvm/gems/ruby-1.9.3-p0/bin/thin:19:in `<main>'

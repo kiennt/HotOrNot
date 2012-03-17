@@ -1,0 +1,32 @@
+#container {
+  width: 560px;
+  height: 560px;
+}
+
+.selected {
+  width: 50px;
+  height: 50px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: #ff0000;
+  margin: 0px 0px 0px 0px;
+  float: left;
+}
+
+.item {
+  width: 50px;
+  height: 50px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ffb500;
+  margin: 2px 2px 2px 2px;
+  float: left;
+}
+
+.voteimage {
+  width: 180px;
+  height: 400px;
+  margin: 2px 2px 2px 2px;
+  float: left;
+}
+
