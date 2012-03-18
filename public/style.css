@@ -23,9 +23,13 @@
   float: left;
 }
 
-.voteimage {
-  width: 180px;
+.vote {
+  width: 410px;
   height: 400px;
+}
+
+.voteimage {
+  width: 200px;
   margin: 2px 2px 2px 2px;
   float: left;
 }

@@ -1,6 +1,5 @@
 <p>Using arrow keys to choose better image</p>
 
-
 <div class='vote'>
   <div id="id1" class='voteimage'><a href='' target='blank'><img src='' id=''/></a></div>
   <div id="id2" class='voteimage'><a href='' target='blank'><img src='' id=''/></a></div>
@@ -22,10 +21,14 @@ $("body").keydown(function(e) {
   var userid1 = $("#id1 img").attr('id');
   var userid2 = $("#id2 img").attr('id');
 
-  if(e.keyCode == 37 || e.keyCode == 72 || e.keyCode == 74) { // left 
+  if (e.keyCode == Key.key_left) {
     loadImage("#id2", '/vote.json/<%= @sex %>/' + userid2 + '/' + userid1) 
-  } else if(e.keyCode == 39 || e.keyCode == 76 || e.keyCode == 75){ // right
+  } else if (e.keyCode == Key.key_right) {
     loadImage("#id1", '/vote.json/<%= @sex %>/' + userid1 + '/' + userid2) 
+  } else if (e.keyCode == Key.key_a) {
+    loadImage("#id1", '/del.json/<%= @sex %>/' + userid1);
+  } else if (e.keyCode == Key.key_d) {
+    loadImage("#id2", '/del.json/<%= @sex %>/' + userid2);
   }
 })
 </script>

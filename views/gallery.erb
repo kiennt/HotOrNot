@@ -1,8 +1,10 @@
-<p>Using arrow keys to navigate between pages</p>
-<p>Press '/' to change from navigate mode to move cursor mode</p>
-<p>In move cursor mode, press 'enter' to go vote page</p>
+<div class="help">
+  Using arrow keys to navigate between pages <br />
+  Press '/' to change from navigate mode to move cursor mode <br />
+  In move cursor mode, press 'enter' to go vote page <br />
+</div>
 
-<p>Page <%= @page %> has <%= @users.length %> pics</p>
+<p>We have <%= @count.to_s + @sex  %></p>
 <div id="container">
 <% @users.each_with_index do |user,index| %>
 <div class="item" id="item<%= index %>" userid="<%= user.id %>">
@@ -18,27 +20,15 @@ var mode = 0; // naviagation mode
 var row = 0;
 var col = 0;
 
-function gotoURL(link) {
-  window.location = link;
-}
-
 function handleNavigationMode(e) {
-  if(e.keyCode == 37 || e.keyCode == 72 || e.keyCode == 74) { // left
+  if(e.keyCode == Key.key_left || e.keyCode == Key.key_a) { // left
     var page = <%= @page.to_i %>;
     if (page > 1)
       gotoURL('<%= "/gallery/#{@sex}/#{@page - 1}" %>');
   }
-  else if(e.keyCode == 39 || e.keyCode == 76 || e.keyCode == 75) { // right
+  else if(e.keyCode == Key.key_right || e.keyCode == Key.key_d) { // right
     gotoURL('<%= "/gallery/#{@sex}/#{@page + 1}" %>');
   }
-}
-
-function min(x, y) {
-  return x > y ? y : x;
-}
-
-function max(x, y) {
-  return x > y ? x : y;
 }
 
 function getSelectedItem() {
@@ -46,19 +36,29 @@ function getSelectedItem() {
 }
 
 function handleMoveMode(e) {
-  getSelectedItem().removeClass("selected").addClass("item");
-  if (e.keyCode == 72 || e.keyCode == 37) {  // h
+  var isMove = isMoveKey(e);
+  
+  // remove old selected item
+  if (isMove) 
+    getSelectedItem().removeClass("selected").addClass("item");
+
+  // handle move
+  if (e.keyCode == Key.key_a || e.keyCode == Key.key_left) {  // a
     col = max(col - 1, 0);
-  } else if (e.keyCode == 74 || e.keyCode == 40) { // j
+  } else if (e.keyCode == Key.key_s || e.keyCode == Key.key_down) { // s
     row = min(row + 1, 9);
-  } else if (e.keyCode == 75 || e.keyCode == 38) { // k
+  } else if (e.keyCode == Key.key_w || e.keyCode == Key.key_up) { // w
     row = max(row - 1, 0);
-  } else if (e.keyCode == 76 || e.keyCode == 39) { // l
+  } else if (e.keyCode == Key.key_d || e.keyCode == Key.key_right) { // d
     col = min(col + 1, 9);
-  } else if (e.keyCode == 13) { // enter
+  } else if (e.keyCode == Key.key_enter) { // enter
     gotoURL('/vote/<%= @sex %>/' + getSelectedItem().attr('userid'));
   }
-  getSelectedItem().removeClass("item").addClass("selected");
+  
+  // show new selected item 
+  if (isMove) {
+    getSelectedItem().removeClass("item").addClass("selected");
+  }
 }
 
 $("body").keydown(function(e) {
@@ -67,7 +67,7 @@ $("body").keydown(function(e) {
   else if (mode == 1)
     handleMoveMode(e);
 
-  if (e.keyCode == 191) {// '/' to change mode
+  if (e.keyCode == Key.key_fslash) {// '/' to change mode
     mode = 1 - mode;
     if (mode == 1) {
       getSelectedItem().removeClass("item").addClass("selected");
@@ -76,7 +76,5 @@ $("body").keydown(function(e) {
     }
   } 
 });
-
-//getSelectedItem().removeClass("item").addClass("selected");
 </script>
 

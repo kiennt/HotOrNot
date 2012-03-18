@@ -4,11 +4,12 @@
 <title><%= "#{@title}" %></title>
 <meta charset=utf8 />
 <script type="text/javascript" src="<%=u 'jquery-1.7.1.min.js' %>"></script>
+<script type="text/javascript" src="<%=u 'key.js' %>"></script>
 <link rel="stylesheet" href="<%=u 'style.css' %>">
 </head>
 
 <body>
-
+<center>
   <div id="main">
     <%= yield %>
   </div>
@@ -17,4 +18,5 @@
     <p><small>An application from <a href="http://kiennt.herokuapp.com">KienNT</a></small></p>
   </footer>
 </body>
+</center>
 </html>

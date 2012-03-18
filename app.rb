@@ -5,7 +5,6 @@ require 'redis'
 require 'json'
 require './models.rb'
 
-## CONTROLLER ACTIONS
 class App < Sinatra::Base
   helpers do
     include Rack::Utils
@@ -24,7 +23,7 @@ class App < Sinatra::Base
   # we dont want to show Server information
   # modify server header after process
   after do
-    response.headers["Server"] = 'ASP Server'
+    response.headers["Server"] = 'nginx'
   end
 
   # create redis client and title 
@@ -65,6 +64,8 @@ class App < Sinatra::Base
       if @page <= 0 then 
         redirect "/gallery/#{params[:sex]}/1"
       else
+        setname = @sex == 'boys' ? 'zusers0' : 'zusers1'
+        @count = @redis.zcard setname
         @pics_per_page = 100
         @users = get_users_from_redis(@sex, @page)
         if @users.length > 0 then
@@ -126,12 +127,57 @@ class App < Sinatra::Base
       {:error => 'key not found'}.to_json
     end
   end
+  
+  get '/del.json/:sex/:id' do
+    content_type :json
+    if ["boys", "girls"].include? params[:sex] then
+      id = params[:id]
+      
+      # add in set delete
+      setname = params[:sex] == 'boys' ? 'sdusers0' : 'sdusers1'
+      @redis.sadd setname, id
+      
+      # delete in sorted set
+      setname1 = params[:sex] == 'boys' ? 'zusers0' : 'zusers1'
+      rank = @redis.zrank setname1, id
+      p = @redis.zremrangebyrank setname1, rank, rank
+
+      # find other random id 
+      idx1, @userid = get_random_userid(params[:sex], id) 
+      {:id => @userid, :pic => @redis.get("#{@userid}:pic_big")}.to_json
+    else
+      {:err => 'sex must be boys or girls'}.to_json
+    end
+  end
 
   get '/vote.json/:sex/:win/:lose' do
-    win = params[:win]    
-    lose = params[:lose]    
     content_type :json
-    idx1, @userid = get_random_userid(params[:sex], win) 
-    {:id => @userid, :pic => @redis.get("#{@userid}:pic_big")}.to_json
+    if ["boys", "girls"].include? params[:sex] then
+      setname = params[:sex] == "boys" ? "zusers0" : "zusers1"
+      
+      # implement elo ranking
+      win_id = params[:win]    
+      r_win = @redis.zscore(setname, win_id).to_i 
+      k_win = r_win < 2400 ? 15 : 10
+      q_win = 10 ** (r_win/400)
+
+      lose_id = params[:lose]
+      r_lose = @redis.zscore(setname, lose_id).to_i
+      k_lose = r_lose < 2400 ? 15 : 10
+      q_lose = 10 ** (r_lose/400)
+
+      e_win = q_win * 1.0/(q_win + q_lose)
+      e_lose = q_lose * 1.0/(q_win + q_lose)
+      del_win = (k_win * (1 - e_win)).to_i
+      del_lose = (k_lose * (0 - e_lose)).to_i
+      @redis.zincrby setname, del_win, win_id 
+      @redis.zincrby setname, del_lose, lose_id 
+          
+      # find other random id 
+      idx1, @userid = get_random_userid(params[:sex], win_id) 
+      {:id => @userid, :pic => @redis.get("#{@userid}:pic_big")}.to_json
+    else
+      {:err => 'sex must be boys or girls'}.to_json
+    end
   end
 end

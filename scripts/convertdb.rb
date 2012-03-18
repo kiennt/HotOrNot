@@ -68,5 +68,14 @@ def create_redis_db()
   end
 end
 
+def add_score_redis_db()
+  redis = Redis.new
+  list_user = redis.smembers "users"
+  list_user.each do |id|
+    sex = redis.get "#{id}:sex"
+    setname = sex == "male" ? "zusers0" : "zusers1"
+    redis.zincrby setname, 1600, id
+  end 
+end
 
-create_redis_db()
+add_score_redis_db()
