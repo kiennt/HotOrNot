@@ -46,10 +46,10 @@ function max(x, y) {
 }
 
 function isMoveKey(e) {
-  if (e.keyCode == Key.key_h ||
-      e.keyCode == Key.key_j ||
-      e.keyCode == Key.key_k ||
-      e.keyCode == Key.key_l ||
+  if (e.keyCode == Key.key_a ||
+      e.keyCode == Key.key_s ||
+      e.keyCode == Key.key_d ||
+      e.keyCode == Key.key_w ||
       e.keyCode == Key.key_up ||
       e.keyCode == Key.key_down ||
       e.keyCode == Key.key_left ||

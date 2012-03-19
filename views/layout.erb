@@ -3,19 +3,26 @@
 <head>
 <title><%= "#{@title}" %></title>
 <meta charset=utf8 />
+<link rel="stylesheet" href="<%=u 'style.css' %>">
 <script type="text/javascript" src="<%=u 'jquery-1.7.1.min.js' %>"></script>
 <script type="text/javascript" src="<%=u 'key.js' %>"></script>
-<link rel="stylesheet" href="<%=u 'style.css' %>">
 </head>
 
 <body>
 <center>
+  <div id="menu-nav">
+    <ul>
+      <li><a href='/'>Home</a></li>
+      <li><a href='/vote/girls'>Vote</a></li>
+    </ul>
+  </div>
+
   <div id="main">
     <%= yield %>
   </div>
 
   <footer>
-    <p><small>An application from <a href="http://kiennt.herokuapp.com">KienNT</a></small></p>
+    <p><small>An application from <a href="http://kntblog.tumblr.com" target='blank'>KienNT</a></small></p>
   </footer>
 </body>
 </center>

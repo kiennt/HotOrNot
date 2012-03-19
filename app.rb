@@ -36,11 +36,6 @@ class App < Sinatra::Base
     erb :notfound
   end 
 
-  # get user information from mysql db
-  def get_users_from_mysql(sex, page)
-    User.all(:sex => sex, :limit => @pics_per_page, :offset => (page - 1) * @pics_per_page)
-  end
-
   # get user information form redis server
   def get_users_from_redis(sex, page)
     set_name = sex == "boys" ? "zusers0" : "zusers1"
@@ -79,11 +74,25 @@ class App < Sinatra::Base
     end
   end
 
+  def min(x, y) 
+    x > y ? y : x
+  end
+
+  def max(x, y)
+    x > y ? x : y
+  end
+
   def get_random_userid(sex, idx = nil)
+    idx = idx.to_i if idx != nil
     setname = sex == 'boys' ? 'zusers0' : 'zusers1' 
     usercount = @redis.zcard setname
+    min_idx = idx == nil ? 0 : idx - 50 
+    minx_idx = max(min_idx, 0)
+    max_idx = idx == nil ? usercount : idx + 50 
+    max_idx = min(max_idx, usercount)
     while true do
-      id = rand(usercount)  
+      #id = rand(min_idx..max_idx)  
+      id = rand(usercount)
       if id != idx then break end
     end
     [id, @redis.zrange(setname, id, id)[0]]

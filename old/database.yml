@@ -1,0 +1,13 @@
+mysql:
+  adapter: mysql
+  host: localhost
+  username: root
+  password: mysql_dlqsym_K
+  database: fb
+
+mongod:
+  adapter: mongod
+  host: localhost
+  username: root
+  password: mongod_K
+  database: fb

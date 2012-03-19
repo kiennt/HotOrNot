@@ -1,11 +1,16 @@
-#container {
-  width: 560px;
-  height: 560px;
+#menu-nav ul li {
+  list-style-type: none;
+  margin-left: 5px;
+}
+
+#pics-container {
+  width: 760px;
+  height: 760px;
 }
 
 .selected {
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 70px;
   border-style: solid;
   border-width: 3px;
   border-color: #ff0000;
@@ -13,9 +18,14 @@
   float: left;
 }
 
+.selected img {
+  width: 70px;
+  height: 70px;
+}
+
 .item {
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 70px;
   border-style: solid;
   border-width: 1px;
   border-color: #ffb500;
@@ -23,14 +33,22 @@
   float: left;
 }
 
+.item img {
+  width: 70px;
+  height: 70px;
+}
+
 .vote {
-  width: 410px;
-  height: 400px;
+  width: 510px;
+  height: 700px;
 }
 
 .voteimage {
-  width: 200px;
+  width: 250px;
   margin: 2px 2px 2px 2px;
   float: left;
 }
 
+.voteimage img {
+  width: 250px;
+}

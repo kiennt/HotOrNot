@@ -5,41 +5,58 @@ require 'redis'
 DEBUG = false
 
 def detect(setqueue, redis, api_key, api_secret)
+  def remove_id(redis, setname, id)
+    rank = redis.zrank setname, id
+    redis.zremrangebyrank setname, rank, rank
+  end
+  
   client = Face.get_client(:api_key => api_key, :api_secret => api_secret)
   while redis.scard(setqueue) > 0 do
     begin
       id = redis.spop setqueue
-      rank = redis.zrank 'zusers1', id
-      puts "%s - rank: %d" % [id, rank] if DEBUG
-      if rank == nil then 
+      rank1 = redis.zrank 'zusers1', id
+      rank2 = redis.zrank 'zusers0', id
+      if rank1 == nil and rank2 == nil then 
         continue 
       end
 
       url = redis.get "#{id}:pic_big"
+      sex = redis.get "#{id}:sex"
+      setname = sex == "male" ? "zusers0" : "zusers1"
       data = client.faces_detect(:urls => url)    
-      if data["photos"][0]["tags"].length != 1 then
-        sex = redis.get "#{id}:sex"
-        puts "%s: %s" % [sex, id] if DEBUG
-        setname = sex == "male" ? "zusers0" : "zusers1"
-        rank = redis.zrank setname, id
-        redis.zremrangebyrank setname, rank, rank
-      else
-        puts "------------- has face: %s" % [id] if DEBUG
-      end
       
-      if data["usage"]["remaining"].to_i == 0 then
-        puts "%s: %s"  % [api_key, data["usage"]["remaining"]]
+      if data["status"] == "failure" then
+        redis.sadd setqueue, id
+        puts data
         sleep 600
-      end 
+      else
+        if data["photos"][0]["tags"].length != 1 then
+          puts "%s: %s" % [sex, id] if DEBUG
+          remove_id redis, setname, id
+        else
+          attrs = data["photos"][0]["tags"][0]["attributes"]
+          if attrs["gender"] == nil or attrs["gender"]["value"] != sex then
+            remove_id redis, setname, id
+          end
+          puts "------------- has face: %s" % [id] if DEBUG
+        end
+        
+        if data["usage"]["remaining"].to_i == 0 then
+          puts "%s: %s"  % [api_key, data["usage"]["remaining"]]
+          puts data
+          sleep 600
+        end 
+      end
     rescue
     end
   end 
 end
 
 def initdb()
+  puts "Init db"
   redis = Redis.new
   redis.del 'userqueue'
-  setname = 'zusers1'
+  setname = 'zusers0'
   count = redis.zcard setname
   list_id = redis.zrange setname, 0, count
   list_id.each {|id| redis.sadd 'userqueue', id}
@@ -55,4 +72,9 @@ def main()
   t3.join
 end
 
+puts ARGV
+if ARGV.length >= 1 then
+  cmd = ARGV[0]
+  if cmd == 'db' then initdb() end
+end
 main()

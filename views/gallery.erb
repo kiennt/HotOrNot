@@ -1,18 +1,24 @@
+<!-- <p>We have <%= @count.to_s + ' ' + @sex  %></p> -->
+<div id="wrapper">
+  <% if @page > 1 then %>
+  <div id="link_left"><a href='/gallery/<%= @sex + '/' + (@page - 1).to_s %>'>Prev</a></div>
+  <% end %>
+  <div id="pics-container">
+    <% @users.each_with_index do |user,index| %>
+    <div class="item" id="item<%= index %>" userid="<%= user.id %>">
+      <a href='/vote/<%= "%s/%s" % [@sex, user.id] %>'>
+        <img src='<%= user.pic_square %>' title='<%= user.name %>' alt='<%= user.id %>' />
+      </a>
+    </div>
+    <% end %>
+  </div>
+  <div id="link_right"><a href='/gallery/<%= @sex + '/' + (@page + 1).to_s %>'>Next</a></div>
+</div>
+
 <div class="help">
   Using arrow keys to navigate between pages <br />
   Press '/' to change from navigate mode to move cursor mode <br />
   In move cursor mode, press 'enter' to go vote page <br />
-</div>
-
-<p>We have <%= @count.to_s + @sex  %></p>
-<div id="container">
-<% @users.each_with_index do |user,index| %>
-<div class="item" id="item<%= index %>" userid="<%= user.id %>">
-  <a href='/vote/<%= "%s/%s" % [@sex, user.id] %>'>
-    <img src='<%= user.pic_square %>' title='<%= user.name %>' alt='<%= user.id %>' />
-  </a>
-</div>
-<% end %>
 </div>
 
 <script type='text/javascript'>
