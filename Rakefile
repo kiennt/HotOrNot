@@ -1,9 +1,8 @@
-#require 'rake'
-#require 'dm-migrations'
-#require './models'
+require 'rake'
 
-#namespace :db do
-  #task :migrate do
-    #DataMapper.auto_migrate!
-  #end
-#end
+namespace :server do
+  task :restart do
+    `thin stop -C /etc/thin/fbhot_dev.yml`
+    `thin start -C /etc/thin/fbhot_dev.yml`
+  end
+end

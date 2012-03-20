@@ -1,25 +1,38 @@
-<p>
-   You can press 'j' or 'k' to choose left girl or right girl.<br />
-   For example, If you press 'j', you will choose the left.<br />
-   The right one will be replace by another girl to compare <br />
-</p>
-<p> You can go to facebook account of user by click to image </p>
-<div class='vote'>
-  <div id="id1" class='voteimage'><a href='' target='blank'><img src='' id=''/></a></div>
-  <div id="id2" class='voteimage'><a href='' target='blank'><img src='' id=''/></a></div>
+<div id="help">
+  <div class="row">
+    <div class="span6 offset4">
+      <p>
+If you like the left image, press <code>j</code> to choose<br />
+We will load anthor image on the right to compare with the left<br />
+In case you like the right, using <code>k</code> to choose <br />
+You can go to <code>facebook</code> account of user by click to image<br />
+      </p>
+    </div>
+  </div>
 </div>
+
+<center>
+<div class="row" style="margin-top: 20px;">
+  <div class="span8 offset2">
+    <div class='vote'>
+      <div id="id1" class='voteimage'><a href='' target='blank'><img src='' id=''/></a></div>
+      <div id="id2" class='voteimage'><a href='' target='blank'><img src='' id=''/></a></div>
+    </div>
+  </div>
+</div>
+</center>
 
 <script type='text/javascript'>
 function loadImage(id, link) {
-  $(id + " img").attr('src', '<%=u "loading.gif" %>');
+  $(id + " img").attr('src', '/img/loading.gif');
   $.getJSON(link, function(data) {
     $(id + " a").attr('href', 'http://www.facebook.com/profile.php?id=' + data.id + '&sk=photos');
     $(id + " a img").attr('src', data.pic).attr('id', data.id);
   });
 }
 
-loadImage("#id1", '/info.json/<%= @userid1 %>');
-loadImage("#id2", '/info.json/<%= @userid2 %>');
+loadImage("#id1", '/info.json/<%= @user1.id %>');
+loadImage("#id2", '/info.json/<%= @user2.id %>');
 
 $("body").keydown(function(e) {
   var userid1 = $("#id1 img").attr('id');

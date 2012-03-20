@@ -1,9 +1,8 @@
 require 'rubygems'
 require 'sinatra'
 require 'erb'
-require 'redis'
 require 'json'
-require './models.rb'
+require './model.rb'
 
 class App < Sinatra::Base
   helpers do
@@ -18,6 +17,35 @@ class App < Sinatra::Base
     def path_prefix
       request.env['SCRIPT_NAME']
     end
+  
+    def paginate(sex, current_page, last_page)
+      num_of_page = 15
+      max_page = [current_page + num_of_page/2, last_page].min
+      min_page = [1, current_page - num_of_page/2].max
+      if max_page ==  last_page then
+        min_page = [max_page - num_of_page, min_page].max
+      elsif min_page == 1
+        max_page = [min_page + num_of_page, max_page].max
+      end
+
+      content = "<div class='pagination'><ul>"
+      if min_page > 1 then
+        page = current_page - 1
+        content << "<li><a href='/gallery/#{sex}/#{page}'>&lt;&lt;</a></li>" 
+      end    
+      (min_page..max_page).each do |page|
+        style = page == current_page ? "class='active' " : ""
+        content << "<li #{style}><a href='/gallery/#{sex}/#{page}'>#{page}</a></li>" 
+      end
+      
+      if max_page < last_page then
+        page = current_page + 1
+        content << "<li><a href='/gallery/#{sex}/#{page}'>&gt;&gt;</a></li>" 
+      end
+      content << "</ul></div>"
+    end
+    alias_method :p, :paginate
+
   end
 
   # we dont want to show Server information
@@ -28,7 +56,6 @@ class App < Sinatra::Base
 
   # create redis client and title 
   before do
-    @redis = Redis.new
     @title = 'Hot or Not'
   end
 
@@ -36,19 +63,7 @@ class App < Sinatra::Base
     erb :notfound
   end 
 
-  # get user information form redis server
-  def get_users_from_redis(sex, page)
-    set_name = sex == "boys" ? "zusers0" : "zusers1"
-    user_ids = @redis.zrange set_name, (page - 1) * @pics_per_page, (page * @pics_per_page - 1) 
-    users = []
-    user_ids.each do |userid|
-      users << User::get_from_redis(userid, @redis) 
-    end
-    users
-  end
-
   get '/' do
-    #erb :static
     redirect '/gallery/girls/1'
   end 
 
@@ -56,13 +71,15 @@ class App < Sinatra::Base
     if ['girls', 'boys'].include? params[:sex] then
       @sex = params[:sex]
       @page = params[:page].to_i
+
       if @page <= 0 then 
         redirect "/gallery/#{params[:sex]}/1"
       else
-        setname = @sex == 'boys' ? 'zusers0' : 'zusers1'
-        @count = @redis.zcard setname
-        @pics_per_page = 100
-        @users = get_users_from_redis(@sex, @page)
+
+        @count = User::count @sex
+        @last_page = (@count - 1)/User::item_per_page + 1
+        
+        @users = User::get_list_users_in_page @sex, @page
         if @users.length > 0 then
           erb :gallery
         else
@@ -74,64 +91,36 @@ class App < Sinatra::Base
     end
   end
 
-  def min(x, y) 
-    x > y ? y : x
-  end
-
-  def max(x, y)
-    x > y ? x : y
-  end
-
-  def get_random_userid(sex, idx = nil)
-    idx = idx.to_i if idx != nil
-    setname = sex == 'boys' ? 'zusers0' : 'zusers1' 
-    usercount = @redis.zcard setname
-    min_idx = idx == nil ? 0 : idx - 50 
-    minx_idx = max(min_idx, 0)
-    max_idx = idx == nil ? usercount : idx + 50 
-    max_idx = min(max_idx, usercount)
-    while true do
-      #id = rand(min_idx..max_idx)  
-      id = rand(usercount)
-      if id != idx then break end
-    end
-    [id, @redis.zrange(setname, id, id)[0]]
-  end
-
-  get '/vote/:sex' do
-    if ['girls', 'boys'].include? params[:sex] then
-      @sex = params[:sex]
-      idx1, @userid1 = get_random_userid(@sex)
-      idx1, @userid2 = get_random_userid(@sex, idx1)
-      erb :vote 
-    else
-      404
-    end
-  end
-
-  get '/vote/:sex/:id' do
-    if ['girls', 'boys'].include? params[:sex] then
-      @sex = params[:sex]
-      zset = @sex == 'boys' ? 'zusers0' : 'zusers1'
-      @userid1 = params[:id]
-      if @redis.zrank(zset, @userid1) != nil then
-        idx1 = @redis.zrank(@sex, @userid1)
-        idx1, @userid2 = get_random_userid(@sex, idx1)
-        erb :vote 
+  ['/vote/:sex', '/vote/:sex/:id'].each do |url|
+    get url do
+      if ['girls', 'boys'].include? params[:sex] then
+        @sex = params[:sex]
+        # get user1
+        if params[:id].nil? then
+          @user1 = User::get_random_user(@sex) 
+        else
+          @user1 = User.new(params[:id])
+        end
+        
+        # get user2
+        if @user1.valid? then
+          @user2 = User::get_random_user(@sex, @user1.rank)
+          erb :vote 
+        else
+          404
+        end
       else
         404
       end
-    else
-      404
-    end
+    end  
   end
 
-  get '/info.json/:userid' do
+  get '/info.json/:id' do
     content_type :json
-    @id = params[:userid]
-    if @redis.sismember('users', @id) then
-      @pic = @redis.get "#{@id}:pic_big"
-      {:id => @id.to_s, :pic => @pic}.to_json
+    @user = User.new params[:id]
+    if @user.valid? then
+      {:id => @user.id, :pic => @user.pic_big, :name => @user.name, 
+       :win => @user.win_count, :lose => @user.lose_count}.to_json
     else
       {:error => 'key not found'}.to_json
     end
@@ -140,20 +129,11 @@ class App < Sinatra::Base
   get '/del.json/:sex/:id' do
     content_type :json
     if ["boys", "girls"].include? params[:sex] then
-      id = params[:id]
-      
-      # add in set delete
-      setname = params[:sex] == 'boys' ? 'sdusers0' : 'sdusers1'
-      @redis.sadd setname, id
-      
-      # delete in sorted set
-      setname1 = params[:sex] == 'boys' ? 'zusers0' : 'zusers1'
-      rank = @redis.zrank setname1, id
-      p = @redis.zremrangebyrank setname1, rank, rank
-
-      # find other random id 
-      idx1, @userid = get_random_userid(params[:sex], id) 
-      {:id => @userid, :pic => @redis.get("#{@userid}:pic_big")}.to_json
+      user_to_del = User.new params[:id]
+      user_to_del.delete
+      @user = User::get_random_user(params[:sex], user_to_del.id)
+      {:id => @user.id, :pic => @user.pic_big, :name => @user.name, 
+       :win => @user.win_count, :lose => @user.lose_count}.to_json
     else
       {:err => 'sex must be boys or girls'}.to_json
     end
@@ -162,29 +142,12 @@ class App < Sinatra::Base
   get '/vote.json/:sex/:win/:lose' do
     content_type :json
     if ["boys", "girls"].include? params[:sex] then
-      setname = params[:sex] == "boys" ? "zusers0" : "zusers1"
-      
-      # implement elo ranking
-      win_id = params[:win]    
-      r_win = @redis.zscore(setname, win_id).to_i 
-      k_win = r_win < 2400 ? 15 : 10
-      q_win = 10 ** (r_win/400)
-
-      lose_id = params[:lose]
-      r_lose = @redis.zscore(setname, lose_id).to_i
-      k_lose = r_lose < 2400 ? 15 : 10
-      q_lose = 10 ** (r_lose/400)
-
-      e_win = q_win * 1.0/(q_win + q_lose)
-      e_lose = q_lose * 1.0/(q_win + q_lose)
-      del_win = (k_win * (1 - e_win)).to_i
-      del_lose = (k_lose * (0 - e_lose)).to_i
-      @redis.zincrby setname, del_win, win_id 
-      @redis.zincrby setname, del_lose, lose_id 
-          
+      # update score
+      User::update_score(params[:win], params[:lose]) 
       # find other random id 
-      idx1, @userid = get_random_userid(params[:sex], win_id) 
-      {:id => @userid, :pic => @redis.get("#{@userid}:pic_big")}.to_json
+      @user = User::get_random_user(params[:sex], params[:lose])
+      {:id => @user.id, :pic => @user.pic_big, :name => @user.name, 
+       :win => @user.win_count, :lose => @user.lose_count}.to_json
     else
       {:err => 'sex must be boys or girls'}.to_json
     end

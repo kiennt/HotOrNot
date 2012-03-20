@@ -10,7 +10,7 @@ class User
   def initialize(id)
     @id = id
   end
-
+  
   def sex
     @sex ||= @@redis.get "#{@id}:sex"
   end
@@ -22,6 +22,10 @@ class User
   def pic_big
     @pic_big ||= @@redis.get "#{@id}:pic_big"
   end
+  
+  def name
+    @name ||= @@redis.get("#{@id}:name").force_encoding("utf-8")
+  end
 
   def score
     @score ||= @@redis.zscore @@zdict[sex], @id
@@ -31,8 +35,21 @@ class User
     @rank ||= @@redis.zrank @@zdict[sex], @id
   end
   
+  def win_count
+    @win_count ||= @@redis.get "#{@id}:win_count"
+  end
+
+  def lose_count
+    @lose_count ||= @@redis.get "#{@id}:lose_count"
+  end
+
   def add_score(delta)
     @@redis.zincrby @@zdict[sex], delta, @id
+    if delta > 0 then
+      @@redis.incr "#{@id}:win_count" 
+    elsif delta < 0  then
+      @@redis.incr "#{@id}:lose_count" 
+    end
   end
 
   def delete
@@ -45,7 +62,11 @@ class User
   def valid?
     score != nil
   end 
-  
+ 
+  def self.item_per_page
+    @@item_per_page
+  end 
+
   def self.count(sex)
     @@redis.zcard @@zdict[sex]
   end  
@@ -57,12 +78,13 @@ class User
     users
   end  
   
-  def self.get_random_user(sex, other_id = nil)
+  def self.get_random_user(sex, other_rank = nil)
     while true do
-      id = rand(User::count) 
-      if id != other_id then break end
+      rank = rand(User::count sex) 
+      if rank != other_rank then break end
     end     
-    User.new(id)
+    id = @@redis.zrange(@@zdict[sex], rank, rank)[0] 
+    User.new id
   end
   
   def self.update_score(win_id, lose_id)
@@ -82,4 +104,5 @@ class User
     lose_D = lose_K * (0 - lose_E)
     lose.add_score lose_D.to_i
   end
+
 end

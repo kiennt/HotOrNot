@@ -3,27 +3,76 @@
 <head>
 <title><%= "#{@title}" %></title>
 <meta charset=utf8 />
-<link rel="stylesheet" href="<%=u 'style.css' %>">
-<script type="text/javascript" src="<%=u 'jquery-1.7.1.min.js' %>"></script>
-<script type="text/javascript" src="<%=u 'key.js' %>"></script>
+<link rel="stylesheet" href="/css/bootstrap.css">
+<link rel="stylesheet" href="/css/style.css">
+<script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap.js"></script>
+<script type="text/javascript" src="/js/key.js"></script>
 </head>
 
 <body>
-<center>
-  <div id="menu-nav">
-    <ul>
-      <li><a href='/'>Home</a></li>
-      <li><a href='/vote/girls'>Vote</a></li>
-    </ul>
+  <!-- Header 
+  =============================================== -->
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href='/'>Hot or Not</a>
+        <ul class="nav">
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown">
+              Gallery<b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="/gallery/girls/1">Girls</a></li>    
+              <li class="divider"></li>
+              <li><a href="/gallery/boys/1">Boys</a></li>    
+            </ul>
+          </li>
+          
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown">
+              Vote<b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="/vote/girls">Girls</a></li>    
+              <li class="divider"></li>
+              <li><a href="/vote/boys">Boys</a></li>    
+            </ul>
+          </li>
+
+          <li><a href="#">About</a></li>
+        </ul>
+      </div> 
+    </div>
   </div>
 
-  <div id="main">
+  
+  <!-- Main content
+  =============================================== -->
+  <div class="container">
+    <div class="row">
+      <div class="span8 offset2">
+        <div class="page-header"></div>
+        <div class="page-header">
+          <h1>Hot or not</h1>
+          Vote for image you like most. Help us find out which hostest girls
+        </div>
+      </div>
+      <div class="span2"></div>
+    </div>
+    
     <%= yield %>
+
+    
+    <!-- Footer
+    =============================================== -->
+    <div class="row" style="margin-top:50px;">
+      <div class="span6 offset5">
+        <p>An application from <a href="http://kntblog.tumblr.com" target='blank'>KienNT</a></p>
+      </div>
+    </div>
   </div>
 
-  <footer>
-    <p><small>An application from <a href="http://kntblog.tumblr.com" target='blank'>KienNT</a></small></p>
-  </footer>
+
 </body>
-</center>
 </html>
