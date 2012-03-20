@@ -1,0 +1,8 @@
+.test [class*="span"] {
+  background-color: #eee;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  text-align: center;
+  line-height: 30px;
+  margin-top: 2px;
+}

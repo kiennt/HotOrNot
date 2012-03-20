@@ -1,0 +1,53 @@
+#menu-nav ul li {
+  list-style-type: none;
+  margin-left: 5px;
+}
+
+#pics-container {
+  width: 660px;
+  height: 660px;
+}
+
+.selected {
+  width: 60px;
+  height: 60px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: #ff0000;
+  margin: 0px 0px 0px 0px;
+  float: left;
+}
+
+.selected img {
+  width: 60px;
+  height: 60px;
+}
+
+.item {
+  width: 60px;
+  height: 60px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ffb500;
+  margin: 2px 2px 2px 2px;
+  float: left;
+}
+
+.item img {
+  width: 60px;
+  height: 60px;
+}
+
+.vote {
+  width: 410px;
+}
+
+.voteimage {
+  width: 200px;
+  margin: 2px 2px 2px 2px;
+  float: left;
+}
+
+.voteimage img {
+  width: 200px;
+}
