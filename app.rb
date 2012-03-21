@@ -17,8 +17,21 @@ class App < Sinatra::Base
     def path_prefix
       request.env['SCRIPT_NAME']
     end
-  
-    def paginate(sex, current_page, last_page)
+    
+    ## 
+    # create pagination 
+    #
+    # parameter
+    #   * prefix_link - String the fixed part in link
+    #   * current_page - int current page will show in active state
+    #   * last_page - int max page of this paginate
+    #
+    # Link in pagination has format {link}:{page}
+    # Use this function like this
+    #   >>> paginate('/gallery/boys/', 10, 100)
+    # This will create pagination from page 5 to page 15 
+    #
+    def paginate(prefix_link, current_page, last_page)
       num_of_page = 15
       max_page = [current_page + num_of_page/2, last_page].min
       min_page = [1, current_page - num_of_page/2].max
@@ -28,19 +41,19 @@ class App < Sinatra::Base
         max_page = [min_page + num_of_page, max_page].max
       end
 
-      content = "<div class='pagination'><ul>"
+      content = "<div class='pagination subnav'><ul>"
       if min_page > 1 then
         page = current_page - 1
-        content << "<li><a href='/gallery/#{sex}/#{page}'>&lt;&lt;</a></li>" 
+        content << "<li><a href='#{prefix_link}/#{page}'>&lt;&lt;</a></li>" 
       end    
       (min_page..max_page).each do |page|
         style = page == current_page ? "class='active' " : ""
-        content << "<li #{style}><a href='/gallery/#{sex}/#{page}'>#{page}</a></li>" 
+        content << "<li #{style}><a href='#{prefix_link}/#{page}'>#{page}</a></li>" 
       end
       
       if max_page < last_page then
         page = current_page + 1
-        content << "<li><a href='/gallery/#{sex}/#{page}'>&gt;&gt;</a></li>" 
+        content << "<li><a href='#{prefix_link}/#{page}'>&gt;&gt;</a></li>" 
       end
       content << "</ul></div>"
     end
