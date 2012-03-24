@@ -42,10 +42,12 @@ module FBHot
     
     def win_count 
       @win_count ||= FBHot.redis.get("#{@id}:win_count") 
+      @win_count ||= 0
     end
 
     def lose_count 
-      @lose_count ||= FBHot.redis.get "#{@id}:lose_count" 
+      @lose_count ||= FBHot.redis.get "#{@id}:lose_count"
+      @lose_count ||= 0
     end
 
     def add_score(delta)
@@ -65,8 +67,8 @@ module FBHot
     end
     
     def to_json
-        {:id => self.id, :pic => self.pic_big, :name => self.name, 
-         :win => self.win_count, :lose => self.lose_count}.to_json
+        {:id => self.id, :pic => self.pic_big, :name => self.name, :rank => self.rank,
+         :score => self.score, :win => self.win_count, :lose => self.lose_count}.to_json
     end
 
     def valid? 

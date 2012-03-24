@@ -174,9 +174,9 @@ module FBHot
       page = params[:page].to_i
       if page > 0 then
         ac = FBHot::AutoCompleteHelper.new
-        ids = ac.search params[:query].split('|'), page
+        ids = ac.search params[:query].split('&'), page
         users = FBHot::User::get_list_users_by_ids(ids)
-        "{'users' => [#{(users.map {|user| user.to_json}).join(',')}]}"
+        "{\"users\":[#{(users.map {|user| user.to_json}).join(',')}]}"
       else
         {:users => []}.to_json
       end
