@@ -7,6 +7,8 @@ require './autocomplete'
 
 module FBHot
   class App < Sinatra::Base
+    set :sessions
+
     helpers do
       include Rack::Utils
       alias_method :h, :escape_html
@@ -72,12 +74,15 @@ module FBHot
     # create redis client and title 
     before do
       @title = 'Hot or Not'
+      if session[:user] then
+        @user = session[:user]
+      end
     end
 
     error 404 do
       erb :notfound
     end 
-
+    
     get '/' do
       redirect '/gallery/girls/1'
     end 
