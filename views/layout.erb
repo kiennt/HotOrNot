@@ -67,15 +67,22 @@
       </div>
       <div class="span2"></div>
     </div>
-    
-    <%= yield %>
-
+   
+    <div id="content"> 
+      <%= yield %>
+    </div>
     
     <!-- Footer
     =============================================== -->
-    <div class="row" style="margin-top:50px;">
-      <div class="span6 offset5">
-        <p>An application from <a href="http://kntblog.tumblr.com" target='blank'>KienNT</a></p>
+
+    <div id="footer">
+      <div class="row" style="margin-top:50px;margin-bottom:50px;">
+        <div class="span6 offset3">
+          <center>
+          <p>An application from <a href="http://kntblog.tumblr.com" target='blank'>KienNT</a></p>
+          <a href="http://mixpanel.com/f/partner"><img src="http://mixpanel.com/site_media/images/partner/badge_blue.png" alt="Real Time Web Analytics" /></a>
+          </center>
+        </div>
       </div>
     </div>
   </div>
@@ -101,6 +108,17 @@ function processScroll() {
     $nav.removeClass('subnav-fixed')
   }
 }
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-16274581-5']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+
 </script>
 </body>
 </html>

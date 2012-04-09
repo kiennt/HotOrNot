@@ -42,19 +42,19 @@ class App < Sinatra::Base
       end
 
       content = "<div class='pagination subnav'><ul>"
-      if min_page > 1 then
-        page = current_page - 1
-        content << "<li><a href='#{prefix_link}/#{page}'>&lt;&lt;</a></li>" 
-      end    
+      # prev page
+      link = current_page > 1 ? "#{prefix_link}/#{current_page - 1}" : "#"
+      content << "<li><a href='#{link}'>&lt;&lt;</a></li>" 
+
       (min_page..max_page).each do |page|
         style = page == current_page ? "class='active' " : ""
         content << "<li #{style}><a href='#{prefix_link}/#{page}'>#{page}</a></li>" 
       end
       
-      if max_page < last_page then
-        page = current_page + 1
-        content << "<li><a href='#{prefix_link}/#{page}'>&gt;&gt;</a></li>" 
-      end
+      # next page
+      link = current_page < last_page ? "#{prefix_link}/#{current_page + 1}" : "#"
+      content << "<li><a href='#{link}'>&lt;&lt;</a></li>" 
+
       content << "</ul></div>"
     end
     alias_method :p, :paginate

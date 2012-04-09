@@ -8,6 +8,10 @@
   height: 660px;
 }
 
+#content {
+  min-height: 100%;
+}
+
 .selected {
   width: 60px;
   height: 60px;
@@ -71,6 +75,6 @@
 }
 
 .pagination a {
-  background-color: #d9edf7;
-  border-color: #bce8f1;
+  background-color: #eeeeee;
+  border-color: #e5e5e5;
 }

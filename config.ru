@@ -5,3 +5,5 @@ Bundler.require
 
 require './app'
 run App
+require 'newrelic_rpm'
+NewRelic::Agent.manual_start :app_name => 'FBHot', :agent_enabled => true
