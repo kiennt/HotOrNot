@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require 'face'
+#require 'face'
 require 'redis'
 
 DEBUG = false
@@ -52,7 +52,7 @@ def detect(setqueue, redis, api_key, api_secret)
   end 
 end
 
-def initdb()
+def initdb
   puts "Init db"
   redis = Redis.new
   redis.del 'userqueue'
@@ -62,7 +62,7 @@ def initdb()
   list_id.each {|id| redis.sadd 'userqueue', id}
 end
 
-def main()
+def check_face
   redis = Redis.new
   t1 = Thread.new { detect("userqueue", redis, 'b79b43d2caba8cb16881d5cd10ee3a27', 'e52fe230843fbc1d46d054e6f04180f6') }
   t2 = Thread.new { detect("userqueue", redis, '781f0ad14b85daf7e3def8d3648d6a1c', '0251857fb3b7aa4494897068f2c73e26') }
@@ -72,9 +72,41 @@ def main()
   t3.join
 end
 
-puts ARGV
-if ARGV.length >= 1 then
-  cmd = ARGV[0]
-  if cmd == 'db' then initdb() end
+def delete_posts
+  redis = Redis.new
+  list_posts = redis.smembers "posts"
+  list_posts.each do |post_id|
+    puts post_id
+    redis.del "#{post_id}:message"
+    redis.del "#{post_id}:created_time"
+    redis.del "#{post_id}:updated_time"
+    redis.del "#{post_id}:like_count"
+    redis.del "#{post_id}:shares"
+    redis.del "#{post_id}:comments"
+    redis.del "#{post_id}:likes"
+  end
+  redis.del "posts"
 end
-main()
+
+def delete_unusers
+  redis = Redis.new
+  list_users = redis.smembers "users"
+  list_girls = redis.zrange "zusers1", 0, -1
+  list_boys = redis.zrange "zusers0", 0, -1
+  list_users.each do |id|
+    if ! list_girls.include?(id) and  ! list_boys.include?(id)
+      puts "del #{id}"
+      redis.srem "users", id
+      redis.del "#{id}:name"
+      redis.del "#{id}:pic_small"
+      redis.del "#{id}:pic_big"
+      redis.del "#{id}:pic"
+      redis.del "#{id}:pic_square"
+      redis.del "#{id}:sex"
+      redis.del "#{id}:birthday"
+      redis.del "#{id}:username"
+    end
+  end
+end
+
+delete_unusers

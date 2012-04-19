@@ -8,6 +8,7 @@
 <script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
 <script type="text/javascript" src="/js/bootstrap.js"></script>
 <script type="text/javascript" src="/js/key.js"></script>
+<script type="text/javascript" src="/js/autocomplete.js"></script>
 </head>
 
 <body>
@@ -44,8 +45,22 @@
         </ul>
 
         <form class="navbar-search pull-left">
-          <input type="text" class="search-query" placeholder="Search">
+          <input type="text" class="search-query" placeholder="Search" data-provide="autocomplete">
         </form>
+        
+        <ul class="nav pull-right">
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown">
+              Sign in<b class="caret"></b>
+            </a>
+            <form class="well form-search dropdown-menu">
+              <input type="text" class="input-small" placeholder="username"> 
+              <input type="password" class="input-small" placeholder="password"> 
+              <button type="submit" class="btn">Sign in</button>
+            </form>
+          </li>
+          <li class="divider"></li>
+        </ul>
       </div> 
     </div>
   </div>
