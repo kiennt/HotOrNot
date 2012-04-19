@@ -57,9 +57,9 @@ module FBHot
     def add_score(delta)
       FBHot.redis.zincrby @@zdict[sex], delta, @id
       if delta > 0 then
-        FBHot.redis.hincrby "user:#{@prefix_id}", "#{@suffix_id}:win_count" 
+        FBHot.redis.hincrby "user:#{@prefix_id}", "#{@suffix_id}:win_count", delta 
       elsif delta < 0  then
-        FBHot.redis.hincrby "user:#{@prefix_id}", "#{@suffix_id}:lose_count" 
+        FBHot.redis.hincrby "user:#{@prefix_id}", "#{@suffix_id}:lose_count", delta
       end
     end
 
