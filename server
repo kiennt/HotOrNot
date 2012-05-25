@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
 nginx start
-redis start
-rcthin start
+/home/fujitalab/DATA/WORK/CPP/redis/bin/redis-server /home/fujitalab/SERVER/redis/redis.conf
+rm -rf /home/fujitalab/SERVER/fb_hot/tmp/pids/*.pid
+service thin start
